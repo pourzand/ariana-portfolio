@@ -6,7 +6,7 @@ interface RotatingIconProps {
   src: string;
   alt: string;
   className?: string;
-  size : number;
+  size? : number;
 }
 
 export default function RotatingIcon({ src, alt, className = '', size = 70 }: RotatingIconProps) {

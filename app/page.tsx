@@ -1,29 +1,48 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import Head from 'next/head';
 import RotatingIcon from './components/RotatingIcon';
 import { getRandomIcons } from './utils/iconUtils';
+import Navbar from './components/navbar';
 
 export default function Home() {
   const icons = getRandomIcons(5);
 
   return (
     <div className="relative min-h-screen">
-      <nav className="fixed left-0 w-1/6 flex flex-col justify-center h-screen pl-4 bg-transparent z-10">
-        <Link href="/" className="mb-6 text-blue-600 underline hover:text-blue-800">Home</Link>
-        <Link href="/prints" className="mb-6 text-blue-600 underline hover:text-blue-800">Prints</Link>
-        <Link href="/#creations" className="mb-6 text-blue-600 underline hover:text-blue-800">Creations</Link>
-        <Link href="/#photos" className="mb-6 text-blue-600 underline hover:text-blue-800">Photos</Link>
-        <Link href="/#about" className="mb-6 text-blue-600 underline hover:text-blue-800">About</Link>
-        <Link href="/#contact" className="mb-6 text-blue-600 underline hover:text-blue-800">Contact</Link>
-      </nav>
-      <main className="min-h-screen p-8">
-        <header className="relative mb-8">
-          <img src="yarn_name.png" alt="ARIANA DIDEBAN" className='name-image w-full max-w-3xl mx-auto' />
-          <RotatingIcon src={icons[0]} alt="Random Icon 1" className="absolute top-0 left-1/4 -translate-x-1/2" />
-          <RotatingIcon src={icons[1]} alt="Random Icon 2" className="absolute top-1/4 right-1/4 translate-x-1/2" />
+      <Head>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Navbar />
+      <main className="min-h-screen p-4 md:p-8 pt-24 md:pt-12">
+        <header className="relative mb-12 mt-8 md:mt-4 flex justify-center">
+          <Image
+            src="/yarn_name.png"
+            alt="ARIANA DIDEBAN"
+            width={900}
+            height={300}
+            className='name-image mx-auto'
+          />
+          <RotatingIcon
+            src={icons[0]}
+            alt="Random Icon 1"
+            className="absolute top-0 left-0 transform -translate-x-1/2"
+          />
+          <RotatingIcon
+            src={icons[1]}
+            alt="Random Icon 2"
+            className="absolute top-1/4 right-0 transform translate-x-1/2"
+          />
         </header>
         <div className="flex justify-center relative">
           <div className="image-container relative">
-            <img src="prints/cake_cleaned-1.png" alt="Artwork" className="image-placeholder max-w-full h-auto" />
+            <Image
+              src="/cake_cleaned-1.png"
+              alt="Artwork"
+              width={1200}
+              height={1200}
+              className="image-placeholder max-w-full h-auto"
+            />
             <RotatingIcon src={icons[2]} alt="Random Icon 3" className="absolute -top-8 -left-8" />
             <RotatingIcon src={icons[3]} alt="Random Icon 4" className="absolute -bottom-8 -right-8" />
           </div>

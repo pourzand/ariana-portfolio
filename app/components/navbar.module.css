@@ -1,0 +1,38 @@
+/* components/Navbar.module.css */
+
+.imageContainer {
+    position: relative;
+    height: 40px;
+    width: auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.image {
+    object-fit: contain;
+    height: 100%;
+    width: auto;
+    max-width: 160px;
+    cursor: pointer;
+}
+
+.mobileImage {
+    object-fit: contain;
+    max-height: 20px;
+    width: auto;
+    max-width: 80px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .imageContainer {
+    height: 20px;
+    margin-bottom: 0;
+  }
+  
+  .image {
+    max-width: 80px;
+  }
+}

@@ -1,63 +1,78 @@
-// 'use client';
-
-// import { useState } from "react";
-
-// const Navbar = () => {
-//   const [menuActive, setMenuActive] = useState(false);
-
-//   const toggleMenu = () => {
-//     setMenuActive(!menuActive);
-//   };
-
-//   return (
-//     <>
-//       <div className="hamburger-menu" onClick={toggleMenu}>
-//         <img className="button-icon" src="button2.png" alt="Menu" />
-//       </div>
-//       <nav className={`nav-menu ${menuActive ? "active" : ""}`}>
-//         <ul>
-//           <li><a href="#prints">Prints</a></li>
-//           <li><a href="#creations">Creations</a></li>
-//           <li><a href="#photos">Photos</a></li>
-//           <li><a href="#about">About</a></li>
-//           <li><a href="#contact">Contact</a></li>
-//         </ul>
-//       </nav>
-//     </>
-//   );
-// };
-
-// export default Navbar;
-
-"use client";
-
-import { useState } from "react";
-import Link from "next/link";
+"use client"
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import styles from './navbar.module.css';
+import RotatingIcon from './RotatingIcon';
 
 const Navbar = () => {
-  const [menuActive, setMenuActive] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const toggleMenu = () => {
-    setMenuActive(!menuActive);
-  };
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
 
-  return (
-    <>
-      <div className="hamburger-menu" onClick={toggleMenu}>
-        <img className="button-icon" src="/button2.png" alt="Menu" />
-      </div>
-      <nav className={`nav-menu ${menuActive ? "active" : ""}`}>
-        <ul>
-          <li><Link href="/prints">Prints</Link></li>
-          <li><Link href="/#creations">Creations</Link></li>
-          <li><Link href="/#photos">Photos</Link></li>
-          <li><Link href="/#about">About</Link></li>
-          <li><Link href="/#contact">Contact</Link></li>
-        </ul>
+    handleResize(); // Set initial state
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const navItems = [
+    { name: 'Home', href: '/' },
+    { name: 'Prints', href: '/prints' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
+  ];
+
+  if (isMobile) {
+    return (
+      <nav className="fixed top-0 left-0 w-full flex items-center h-16 bg-white z-10 shadow-md">
+        <div className="flex justify-between items-center w-full px-4">
+          {navItems.map((item, index) => (
+            <React.Fragment key={item.name}>
+              <Link href={item.href} className="hover:text-blue-800">
+                <div style={{ height: '20px' }}>
+                  <Image
+                    src={`/${item.name.toLowerCase()}.png`}
+                    alt={item.name}
+                    width={80}
+                    height={20}
+                    className={styles.mobileImage}
+                  />
+                </div>
+              </Link>
+              {index === 1 && (
+                <div className="-mt-4 -ml-4 flex items-center" style={{ marginTop: '-2px' }}>
+                  <RotatingIcon src="/icons/bow_yarn-1.png" alt="Separator" size={30} />
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
       </nav>
-    </>
+    );
+  }
+
+  // Desktop version remains unchanged
+  return (
+    <nav className="fixed left-2 w-1/6 flex flex-col justify-center h-screen pl-2 bg-transparent z-10">
+      {navItems.map((item) => (
+        <Link key={item.name} href={item.href} className="hover:text-blue-800">
+          <div className={styles.imageContainer}>
+            <Image
+              src={`/${item.name.toLowerCase()}.png`}
+              alt={item.name}
+              width={160}
+              height={40}
+              className={styles.image}
+            />
+          </div>
+        </Link>
+      ))}
+    </nav>
   );
 };
 
 export default Navbar;
-

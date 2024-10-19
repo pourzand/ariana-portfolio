@@ -11,7 +11,10 @@ interface ImageInfo {
   width: number;
   height: number;
   variants: string[];
-  aspectRatio: number; 
+  aspectRatio: number;
+  name: string;
+  year: string;
+  medium: string;
 }
 
 const getImageDimensions = (filename: string): Promise<{ width: number; height: number }> => {
@@ -36,6 +39,24 @@ const groupImages = (filenames: string[]): Record<string, string[]> => {
   return groups;
 };
 
+const parseFilename = (filename: string): { name: string; year: string; medium: string } => {
+  const parts = filename.split('_');
+  const name = parts[0].replace(/-/g, ' ');
+  const year = parts[1];
+  let medium = parts[2];
+  
+  // Remove file extension
+  medium = medium.split('.')[0];
+  
+  // Remove variant indicator if present
+  const variantIndex = medium.lastIndexOf('-');
+  if (variantIndex !== -1) {
+    medium = medium.substring(0, variantIndex);
+  }
+  
+  return { name, year, medium };
+};
+
 export default function JigsawGallery({ filenames }: { filenames: string[] }) {
   const [images, setImages] = useState<ImageInfo[]>([]);
   const [displayedVariants, setDisplayedVariants] = useState<Record<string, string>>({});
@@ -57,11 +78,15 @@ export default function JigsawGallery({ filenames }: { filenames: string[] }) {
       const groupedImages = groupImages(filenames);
       const imagePromises = Object.entries(groupedImages).map(async ([baseName, variants]) => {
         const dimensions = await getImageDimensions(variants[0]);
+        const { name, year, medium } = parseFilename(variants[0]);
         return {
           src: `/prints/${variants[0]}`,
           variants,
           ...dimensions,
           aspectRatio: dimensions.width / dimensions.height,
+          name,
+          year,
+          medium,
         };
       });
 
@@ -90,6 +115,12 @@ export default function JigsawGallery({ filenames }: { filenames: string[] }) {
     setDisplayedVariants(prev => ({ ...prev, [baseName]: `/prints/${newVariant}` }));
   }, []);
 
+  const getColorFromVariant = (variant: string | undefined): string => {
+    if (!variant) return '1';
+    const parts = variant.split('/').pop()?.split('-');
+    return parts && parts.length > 1 ? parts[1].split('.')[0] : '1';
+  };
+
   return (
     <Masonry
       breakpointCols={breakpointColumnsObj}
@@ -98,16 +129,17 @@ export default function JigsawGallery({ filenames }: { filenames: string[] }) {
     >
       {images.map((image, index) => {
         const [baseName] = image.src.split('/').pop()!.split('-');
+        const currentVariant = displayedVariants[baseName];
         return (
           <div key={index} className="retro-card">
             <table cellSpacing="0" cellPadding="5" border={1} bgcolor="#FFFFFF" width="100%">
               <tbody>
                 <tr>
                   <td align="center">
-                    <Link href={`/print/${baseName}?color=${displayedVariants[baseName]?.split('/').pop()?.split('-')[1].split('.')[0] || '1'}`}>
+                    <Link href={`/print/${baseName}?color=${getColorFromVariant(currentVariant)}`}>
                       <div style={{ position: 'relative', paddingBottom: `${(1 / image.aspectRatio) * 100}%` }}>
                         <Image
-                          src={displayedVariants[baseName] || image.src}
+                          src={currentVariant || image.src}
                           alt={`Print ${baseName}`}
                           layout="fill"
                           objectFit="contain"
@@ -127,7 +159,7 @@ export default function JigsawGallery({ filenames }: { filenames: string[] }) {
                               <td key={vIndex}>
                                 <div
                                   className={`retro-variant ${
-                                    displayedVariants[baseName] === `/prints/${variant}` ? 'selected' : ''
+                                    currentVariant === `/prints/${variant}` ? 'selected' : ''
                                   } ${isMobile ? 'mobile' : 'desktop'}`}
                                   onMouseEnter={() => !isMobile && handleVariantInteraction(baseName, variant)}
                                   onClick={() => isMobile && handleVariantInteraction(baseName, variant)}
@@ -150,9 +182,9 @@ export default function JigsawGallery({ filenames }: { filenames: string[] }) {
                 )}
                 <tr>
                   <td align="center">
-                    <button className="retro-button">
-                      Add to Cart
-                    </button>
+                    <div style={{ color: "red" }}>{image.name}, {image.year}, {image.medium}</div>
+                    {/* <div>{image.year}</div>
+                    <div>{image.year}</div> */}
                   </td>
                 </tr>
               </tbody>
